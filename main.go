@@ -11,9 +11,7 @@ import (
 )
 
 func main() {
-	var (
-		err error
-	)
+	var err error
 
 	teamPoints := make(map[string]int)
 
@@ -25,14 +23,16 @@ func main() {
 	}
 
 	orderedPoints := orderTeamPoints(teamPoints)
+
 	generateOutput(orderedPoints)
 }
 
-// scanTxtAndPopulateTeamPoints scans in the file and calculates points.
+// scanTxtAndPopulateTeamPoints scans in the file and calculates points for each team.
 func scanTxtAndPopulateTeamPoints(fileName string, teamPoints map[string]int) error {
 	var (
 		scanner *bufio.Scanner
 		file    *os.File
+		text    string
 		err     error
 	)
 
@@ -44,13 +44,17 @@ func scanTxtAndPopulateTeamPoints(fileName string, teamPoints map[string]int) er
 	defer file.Close()
 
 	scanner = bufio.NewScanner(file)
-
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
 			return err
 		}
 
-		team1Name, team1Points, team2Name, team2Points, err := deriveTeamsFromText(strings.TrimSpace(scanner.Text()))
+		text = strings.TrimSpace(scanner.Text())
+		if text == "" {
+			continue
+		}
+
+		team1Name, team1Points, team2Name, team2Points, err := deriveTeamsFromText(text)
 		if err != nil {
 			return err
 		}
@@ -102,9 +106,7 @@ func deriveTeamsFromText(entry string) (string, int, string, int, error) {
 // teamPoints is first ordered alphabetically via team name, and then ordered by points, so that in the case of a tie
 // the teams are ordered alphabetically.
 func orderTeamPoints(teamPoints map[string]int) TeamPointsPairList {
-	var (
-		i int
-	)
+	var i int
 
 	keys := make([]string, 0, len(teamPoints))
 
@@ -152,6 +154,7 @@ func generateOutput(orderedPoints TeamPointsPairList) {
 
 	for j, v := range orderedPoints {
 		i++
+
 		if j > 0 && (v.Value != orderedPoints[j-1].Value) {
 			k = i
 		}

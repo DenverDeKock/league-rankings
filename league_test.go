@@ -18,18 +18,23 @@ func TestScanTxtAndPopulateTeamPoints(t *testing.T) {
 	}{
 		{
 			"inputs/input1.txt",
-			"Example input test",
+			"test 1 - basic input",
 			map[string]int{"Tarantulas": 6, "Grouches": 0, "FC Awesome": 1, "Lions": 5, "Snakes": 1},
 		},
 		{
 			"inputs/input2.txt",
-			"Testing ordering for teams that are tied",
+			"test 2 - matching scores",
 			map[string]int{"aa team": 6, "ab team": 6, "ba team": 3, "bb team": 3, "bc team": 3, "ca team": 1, "cb team": 1},
 		},
 		{
 			"inputs/input3.txt",
-			"Testing large inputs",
+			"test 3 - large input",
 			map[string]int{"FC Awesome": 14336, "Grouches": 0, "Lions": 71680, "Snakes": 14336, "Tarantulas": 86016},
+		},
+		{
+			"inputs/input4.txt",
+			"test 4 - more matching scores",
+			map[string]int{"aa team": 3, "ab team": 1, "ba team": 6, "cb team": 3, "cc team": 1, "da team": 6},
 		},
 	}
 
@@ -37,6 +42,7 @@ func TestScanTxtAndPopulateTeamPoints(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			_ = scanTxtAndPopulateTeamPoints(tt.input, inputMap)
 			assert.Equal(t, tt.expected, inputMap, "they should be equal")
+
 			inputMap = make(map[string]int)
 		})
 	}
@@ -50,7 +56,7 @@ func TestDeriveTeamsFromText(t *testing.T) {
 	}{
 		{
 			"Tarantulas 1, FC Awesome 0",
-			"test 1",
+			"test 1 - basic names",
 			[]interface{}{
 				"Tarantulas",
 				1,
@@ -60,7 +66,7 @@ func TestDeriveTeamsFromText(t *testing.T) {
 		},
 		{
 			"Best in the Game 5, Worst in the game 0",
-			"test 2",
+			"test 2 - more white space",
 			[]interface{}{
 				"Best in the Game",
 				5,
@@ -89,7 +95,7 @@ func TestOrderTeamPoints(t *testing.T) {
 	}{
 		{
 			map[string]int{"Tarantulas": 6, "Grouches": 0, "FC Awesome": 1, "Lions": 5, "Snakes": 1},
-			"test 1",
+			"test 1 - basic input",
 			[]TeamPointsPair{
 				{Key: "Tarantulas", Value: 6},
 				{Key: "Lions", Value: 5},
@@ -100,7 +106,7 @@ func TestOrderTeamPoints(t *testing.T) {
 		},
 		{
 			map[string]int{"bb team": 3, "ab team": 6, "ca team": 1, "aa team": 6, "bc team": 3, "cb team": 1, "ba team": 3},
-			"test 2",
+			"test 2 - matching scores and alphabetic ordering",
 			[]TeamPointsPair{
 				{Key: "aa team", Value: 6},
 				{Key: "ab team", Value: 6},
@@ -109,6 +115,18 @@ func TestOrderTeamPoints(t *testing.T) {
 				{Key: "bc team", Value: 3},
 				{Key: "ca team", Value: 1},
 				{Key: "cb team", Value: 1},
+			},
+		},
+		{
+			map[string]int{"aa team": 3, "ab team": 1, "ba team": 6, "cb team": 3, "cc team": 1, "da team": 6},
+			"test 3 - more matching scores and alphabetic ordering",
+			[]TeamPointsPair{
+				{Key: "ba team", Value: 6},
+				{Key: "da team", Value: 6},
+				{Key: "aa team", Value: 3},
+				{Key: "cb team", Value: 3},
+				{Key: "ab team", Value: 1},
+				{Key: "cc team", Value: 1},
 			},
 		},
 	}

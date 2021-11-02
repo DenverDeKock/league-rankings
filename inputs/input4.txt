@@ -1,0 +1,14 @@
+ba team 2, cb team 0
+ba team 2, cb team 0
+da team 2, cb team 0
+da team 2, cb team 0
+
+aa team 1, cb team 0
+cb team 1, aa team 0
+ab team 1, cc team 1
+
+
+
+
+
+

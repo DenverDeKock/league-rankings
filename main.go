@@ -20,12 +20,15 @@ func main() {
 	err = scanTxtAndPopulateTeamPoints(os.Args[1], teamPoints)
 	if err != nil {
 		log.Fatal(err)
+
+		return
 	}
 
 	orderedPoints := orderTeamPoints(teamPoints)
 	generateOutput(orderedPoints)
 }
 
+// scanTxtAndPopulateTeamPoints scans in the file and calculates points.
 func scanTxtAndPopulateTeamPoints(fileName string, teamPoints map[string]int) error {
 	var (
 		scanner *bufio.Scanner
@@ -43,10 +46,13 @@ func scanTxtAndPopulateTeamPoints(fileName string, teamPoints map[string]int) er
 	scanner = bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		team1Name, team1Points, team2Name, team2Points, err := deriveTeamsFromText(strings.TrimSpace(scanner.Text()))
+		if err := scanner.Err(); err != nil {
+			return err
+		}
 
+		team1Name, team1Points, team2Name, team2Points, err := deriveTeamsFromText(strings.TrimSpace(scanner.Text()))
 		if err != nil {
-			fmt.Printf("%+v", err)
+			return err
 		}
 
 		switch {
@@ -62,13 +68,10 @@ func scanTxtAndPopulateTeamPoints(fileName string, teamPoints map[string]int) er
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
+// deriveTeamsFromText determines team names and associated scores for a single line entry.
 func deriveTeamsFromText(entry string) (string, int, string, int, error) {
 	var (
 		comma, whiteSpace1, whiteSpace2, team1Points, team2Points int
@@ -84,19 +87,20 @@ func deriveTeamsFromText(entry string) (string, int, string, int, error) {
 
 	team1Points, err = strconv.Atoi(t1str[whiteSpace1+1:])
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+		return "", 0, "", 0, err
 	}
 
 	team2Points, err = strconv.Atoi(t2str[whiteSpace2+1:])
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+		return "", 0, "", 0, err
 	}
 
 	return t1str[:whiteSpace1], team1Points, t2str[:whiteSpace2], team2Points, err
 }
 
+// orderTeamPoints takes teamPoints and orders the league, which is returned as a TeamPointsPairList.
+// teamPoints is first ordered alphabetically via team name, and then ordered by points, so that in the case of a tie
+// the teams are ordered alphabetically.
 func orderTeamPoints(teamPoints map[string]int) TeamPointsPairList {
 	var (
 		i int
@@ -141,6 +145,7 @@ func (t TeamPointsPairList) Less(i, j int) bool {
 	return t[i].Value > t[j].Value
 }
 
+// generateOutput uses the TeamPointsPairList to print out the league via stdout.
 func generateOutput(orderedPoints TeamPointsPairList) {
 	i := 0
 	k := 1

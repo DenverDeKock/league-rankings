@@ -9,7 +9,7 @@ import (
 )
 
 func TestScanTxtAndPopulateTeamPoints(t *testing.T) {
-	inputMap := make(map[string]int, 0)
+	inputMap := make(map[string]int)
 
 	var tests = []struct {
 		input       string
@@ -17,9 +17,19 @@ func TestScanTxtAndPopulateTeamPoints(t *testing.T) {
 		expected    map[string]int
 	}{
 		{
-			"input.txt",
-			"test 1",
+			"inputs/input1.txt",
+			"Example input test",
 			map[string]int{"Tarantulas": 6, "Grouches": 0, "FC Awesome": 1, "Lions": 5, "Snakes": 1},
+		},
+		{
+			"inputs/input2.txt",
+			"Testing ordering for teams that are tied",
+			map[string]int{"aa team": 6, "ab team": 6, "ba team": 3, "bb team": 3, "bc team": 3, "ca team": 1, "cb team": 1},
+		},
+		{
+			"inputs/input3.txt",
+			"Testing large inputs",
+			map[string]int{"FC Awesome": 14336, "Grouches": 0, "Lions": 71680, "Snakes": 14336, "Tarantulas": 86016},
 		},
 	}
 
@@ -27,7 +37,7 @@ func TestScanTxtAndPopulateTeamPoints(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			_ = scanTxtAndPopulateTeamPoints(tt.input, inputMap)
 			assert.Equal(t, tt.expected, inputMap, "they should be equal")
-			inputMap = make(map[string]int, 0)
+			inputMap = make(map[string]int)
 		})
 	}
 }
@@ -45,6 +55,16 @@ func TestDeriveTeamsFromText(t *testing.T) {
 				"Tarantulas",
 				1,
 				"FC Awesome",
+				0,
+			},
+		},
+		{
+			"Best in the Game 5, Worst in the game 0",
+			"test 2",
+			[]interface{}{
+				"Best in the Game",
+				5,
+				"Worst in the game",
 				0,
 			},
 		},
@@ -78,6 +98,19 @@ func TestOrderTeamPoints(t *testing.T) {
 				{Key: "Grouches", Value: 0},
 			},
 		},
+		{
+			map[string]int{"bb team": 3, "ab team": 6, "ca team": 1, "aa team": 6, "bc team": 3, "cb team": 1, "ba team": 3},
+			"test 2",
+			[]TeamPointsPair{
+				{Key: "aa team", Value: 6},
+				{Key: "ab team", Value: 6},
+				{Key: "ba team", Value: 3},
+				{Key: "bb team", Value: 3},
+				{Key: "bc team", Value: 3},
+				{Key: "ca team", Value: 1},
+				{Key: "cb team", Value: 1},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -105,6 +138,19 @@ func TestGenerateOutput(t *testing.T) {
 			},
 			"test 1",
 			"1. Tarantulas, 6 pts\n2. Lions, 5 pts\n3. FC Awesome, 1 pt\n3. Snakes, 1 pt\n5. Grouches, 0 pts\n",
+		},
+		{
+			[]TeamPointsPair{
+				{Key: "aa team", Value: 6},
+				{Key: "ab team", Value: 6},
+				{Key: "ba team", Value: 3},
+				{Key: "bb team", Value: 3},
+				{Key: "bc team", Value: 3},
+				{Key: "ca team", Value: 1},
+				{Key: "cb team", Value: 1},
+			},
+			"test 2",
+			"1. aa team, 6 pts\n1. ab team, 6 pts\n3. ba team, 3 pts\n3. bb team, 3 pts\n3. bc team, 3 pts\n6. ca team, 1 pt\n6. cb team, 1 pt\n",
 		},
 	}
 

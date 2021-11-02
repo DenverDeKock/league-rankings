@@ -1,0 +1,8 @@
+ca team 1, cb team 1
+bb team 2, bc team 1
+bc team 2, bb team 1
+ba team 2, bb team 1
+aa team 1, bb team 0
+aa team 2, cb team 1
+ab team 3, ab team 1
+ab team 4, bb team 1

@@ -106,8 +106,6 @@ func deriveTeamsFromText(entry string) (string, int, string, int, error) {
 // teamPoints is first ordered alphabetically via team name, and then ordered by points, so that in the case of a tie
 // the teams are ordered alphabetically.
 func orderTeamPoints(teamPoints map[string]int) TeamPointsPairList {
-	var i int
-
 	keys := make([]string, 0, len(teamPoints))
 
 	for k := range teamPoints {
@@ -118,9 +116,8 @@ func orderTeamPoints(teamPoints map[string]int) TeamPointsPairList {
 
 	points := make(TeamPointsPairList, len(keys))
 
-	for _, v := range keys {
+	for i, v := range keys {
 		points[i] = TeamPointsPair{v, teamPoints[v]}
-		i++
 	}
 
 	sort.Sort(points)
